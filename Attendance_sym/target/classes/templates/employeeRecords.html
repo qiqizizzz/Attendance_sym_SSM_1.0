@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>考勤记录</title>
+    <link rel="stylesheet" href="/css/employeemain.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* 搜索栏样式 */
+        .search-bar {
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 表格样式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        table th, table td {
+            padding: 12px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        table th {
+            background-color: rgb(33, 33, 33);
+            color: white;
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* 分页按钮样式 */
+        .pagination {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            background-color: rgb(33, 33, 33);
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .pagination button:hover {
+            background-color: rgb(58, 58, 58);
+        }
+
+        .pagination span {
+            font-size: 16px;
+            font-weight: bold;
+            color: rgb(33, 33, 33);
+        }
+
+        /* 搜索按钮样式 */
+        form button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: rgb(33, 33, 33);
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        form button:hover {
+            background-color: rgb(58, 58, 58);
+        }
+
+        form input[type="datetime-local"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        /* 主体标题样式 */
+        section h1 {
+            font-size: 28px;
+            color: rgb(33, 33, 33);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<!-- 员工界面 -->
+<!-- 头部 -->
+<header>
+    <div class="logo">
+        <span>企业考勤系统</span>
+    </div>
+    <div class="user">
+        <img src="/img/userimg.jpg" alt="userimg">
+        <span th:text="${username}">[username]</span>
+    </div>
+</header>
+
+<!-- 主体和侧边栏的容器 -->
+<div class="container">
+    <!-- 侧边栏 -->
+    <aside>
+        <ul>
+            <li><a href="/employee"><span class="icon"></span>首页</a></li>
+            <li><a href="/employee/employeeRecords"><span class="icon"></span>考勤记录</a></li>
+            <li><a href="/employee/leaveApply"><span class="icon"></span>请假申请</a></li>
+            <li><a href="/employee/overtime"><span class="icon"></span>加班记录</a></li>
+            <li><a href="/employee/attendanceStatistics"><span class="icon"></span>考勤统计</a></li>
+            <li><a href="/employee/helpAndSupport"><span class="icon"></span>帮助与支持</a></li>
+            <li><a href="/login"><span class="icon"></span>退出登录</a></li>
+        </ul>
+    </aside>
+
+    <!-- 主体内容 -->
+    <section>
+        <!-- 搜索和过滤 -->
+        <form action="/employee/employeeRecords" method="get" id="attendanceSearchForm">
+            <label for="startDate">开始日期：</label>
+            <input type="datetime-local" id="startDate" name="startDate">
+
+            <label for="endDate">结束日期：</label>
+            <input type="datetime-local" id="endDate" name="endDate">
+
+            <button type="submit" style="font-weight: 600;">查看考勤</button>
+        </form>
+
+        <!-- 表格展示 -->
+        <table>
+            <thead>
+            <tr>
+                <th>序号</th>
+                <th>员工编号</th>
+                <th>打卡时间</th>
+                <th>打卡类型</th>
+                <th>请假原因(如果有)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- 使用 th:each 遍历多条考勤记录 -->
+            <tr th:each="record, iterStat : ${attendanceRecords}">
+                <td th:text="${(currentPage - 1) * size + iterStat.index + 1}"></td>  <!-- 渲染考勤序号 -->
+                <td th:text="${record.employee_id}"></td>  <!-- 渲染员工编号 -->
+                <td th:text="${#dates.format(record.attendance_time, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                <td th:text="${record.attendance_type}"></td>  <!-- 渲染打卡类型 -->
+                <td th:text="${record.leave_reason != null ? record.leave_reason : '无'}"></td>  <!-- 渲染请假原因 -->
+            </tr>
+            <tr th:if="${attendanceRecords == null}">
+                <td colspan="5" th:text="'没有考勤记录'"></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- 分页控件 -->
+        <div class="pagination">
+            <!-- 上一页按钮 -->
+            <button th:if="${currentPage > 1}"
+                    th:onclick="'window.location.href=\'/employee/employeeRecords?page=' + (${currentPage} - 1) + '&size=' + ${size} + '\''">
+                上一页
+            </button>
+
+            <!-- 当前页码显示 -->
+            <span th:text="'第 ' + ${currentPage} + ' 页 / 共 ' + ${totalPages} + ' 页'"></span>
+
+            <!-- 下一页按钮 -->
+            <button th:if="${currentPage < totalPages}"
+                    th:onclick="'window.location.href=\'/employee/employeeRecords?page=' + (${currentPage} + 1) + '&size=' + ${size} + '\''">
+                下一页
+            </button>
+        </div>
+
+    </section>
+</div>
+
+<script>
+    // 按日期搜索功能
+    document.getElementById("attendanceSearchForm").addEventListener("submit", function(event) {
+        // 获取日期范围
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
+
+        // 确保日期范围有效
+        if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+            alert("结束日期必须大于开始日期！");
+            event.preventDefault();  // 阻止表单提交
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" href="/css/employeemain.css">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <!-- 引入 Google 字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- 员工界面 -->
+<!-- 头部 -->
+<header>
+    <div class="logo">
+        <span>企业考勤系统</span>
+    </div>
+    <div class="user">
+        <img src="/img/userimg.jpg" alt="userimg">
+        <span th:text="${username}">[username]</span>
+    </div>
+</header>
+<!-- 主体和侧边栏的容器 -->
+<div class="container">
+    <!-- 侧边栏 -->
+    <aside>
+        <ul>
+            <li><a href="/admin"><span class="icon"></span>首页</a></li>
+            <li><a href="/admin/adminEmployee"><span class="icon"></span>员工管理</a></li>
+            <li><a href="/admin/adminDepartment"><span class="icon"></span>部门管理</a></li>
+            <li><a href="/admin/#"><span class="icon"></span>其他功能</a></li>
+            <li><a href="/admin/#"><span class="icon"></span>其他功能</a></li>
+            <li><a href="/helpAndSupport"><span class="icon"></span>帮助与支持</a></li>
+            <li><a href="/login"><span class="icon"></span>退出登录</a></li>
+        </ul>
+    </aside>
+    <!-- 主体内容 -->
+    <section>
+        <h1>你好,管理员<span th:text="${username}">[username]</span>!</h1>
+        <p>欢迎使用企业管理系统！</p>
+    </section>
+</div>
+</body>
+</html>
+

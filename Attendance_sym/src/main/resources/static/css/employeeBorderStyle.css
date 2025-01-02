@@ -1,0 +1,68 @@
+.attendance-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 30px 20px;
+    padding: 30px;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    color: #333;
+}
+
+.attendance-container h2 {
+    font-size: 24px;
+    color: #45a049;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.attendance-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.attendance-container label {
+    font-weight: 500;
+    color: #555;
+}
+
+.attendance-container select,
+.attendance-container button {
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #333;
+    background-color: #f7f7f7;
+}
+
+.attendance-container select:focus,
+.attendance-container button:focus {
+    outline: none;
+    border-color: #45a049;
+}
+
+.attendance-container button {
+    background-color: #45a049;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.attendance-container button:hover {
+    background-color: #388e3c;
+}
+
+#attendanceTimeDisplay {
+    font-weight: 600;
+    color: #333;
+    font-size: 18px;
+}
+
+hr {
+    margin: 30px 0;
+    border: 0;
+    border-top: 2px solid #e0e0e0;
+}

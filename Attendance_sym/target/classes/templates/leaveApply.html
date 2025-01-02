@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" href="/css/employeemain.css">
+<head>
+    <meta charset="UTF-8">
+    <title>请假申请</title>
+    <!-- 引入 Google 字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<style>
+    /* 表单容器 */
+    .form-container {
+        width: 40%;
+        margin-top: 20px;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 表单输入框和选择框样式 */
+    .form-container input,
+    .form-container textarea {
+        width: 95%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        color: #333;
+        background-color: #f9f9f9;
+        transition: border-color 0.3s ease;
+    }
+
+
+    .form-container select{
+        width: 20%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        color: #333;
+        background-color: #f9f9f9;
+        transition: border-color 0.3s ease;
+    }
+
+    /* 聚焦效果 */
+    .form-container input:focus,
+    .form-container select:focus,
+    .form-container textarea:focus {
+        border-color: #4CAF50;
+        outline: none;
+    }
+
+    /* 请假原因文本框 */
+    .form-container textarea {
+        resize: none; /* 防止文本框被缩放 */
+        height: 220px;
+    }
+
+    /* 标签样式 */
+    .form-container label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    /* 提交按钮样式 */
+    .form-container button {
+        width: 100%;
+        padding: 12px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    /* 提交按钮悬停效果 */
+    .form-container button:hover {
+        background-color: #45a049;
+    }
+
+    /* 提交按钮点击效果 */
+    .form-container button:active {
+        background-color: #388e3c;
+    }
+
+    /* 在小屏设备上的调整 */
+    @media (max-width: 768px) {
+        .form-container {
+            padding: 15px;
+        }
+
+        .form-container input,
+        .form-container select,
+        .form-container textarea {
+            font-size: 12px;
+            resize: vertical;
+        }
+
+        .form-container button {
+            font-size: 14px;
+        }
+    }
+</style>
+<body>
+<!-- 员工界面 -->
+<!-- 头部 -->
+<header>
+    <div class="logo">
+        <span>企业考勤系统</span>
+    </div>
+    <div class="user">
+        <img src="/img/userimg.jpg" alt="userimg">
+        <span th:text="${username}">[username]</span>
+    </div>
+</header>
+<!-- 主体和侧边栏的容器 -->
+<div class="container">
+    <!-- 侧边栏 -->
+    <aside>
+        <ul>
+            <li><a href="/employee"><span class="icon"></span>首页</a></li>
+            <li><a href="/employee/employeeRecords"><span class="icon"></span>考勤记录</a></li>
+            <li><a href="/employee/leaveApply"><span class="icon"></span>请假申请</a></li>
+            <li><a href="/employee/overtime"><span class="icon"></span>加班记录</a></li>
+            <li><a href="/employee/attendanceStatistics"><span class="icon"></span>考勤统计</a></li>
+            <li><a href="/employee/helpAndSupport"><span class="icon"></span>帮助与支持</a></li>
+            <li><a href="/login"><span class="icon"></span>退出登录</a></li>
+        </ul>
+    </aside>
+    <!-- 主体内容 -->
+    <section>
+        <div class="Application">
+            <h2>请假申请</h2>
+            <!-- 请假表单 -->
+            <!--字段名分别是attendance_id,employee_id,attendance_time,attendance_type,leave_reason-->
+        </div>
+        <!-- 请假表单 -->
+        <div class="form-container">
+            <form action="/employee/leaveApply" method="POST">
+                <!-- 员工编号 -->
+                <label for="employeeId">员工编号：</label>
+                <input type="text" id="employeeId" name="employeeId" required>
+
+                <!-- 请假时间 -->
+                <label for="leaveTime">请假时间：</label>
+                <input type="datetime-local" id="leaveTime" name="leaveTime" required>
+
+                <!-- 请假类型 -->
+                <label for="attendanceType">考勤类别：</label>
+                <select id="attendanceType" name="Type" required>
+                    <option value="请假">请假</option>
+                </select>
+
+                <!-- 请假原因 -->
+                <label for="leaveReason">请假原因：</label>
+                <textarea id="leaveReason" name="leaveReason" rows="4" placeholder="请输入请假原因..." required></textarea>
+
+                <!-- 提交按钮 -->
+                <button type="submit" id="linkbuttons">提交申请</button>
+            </form>
+        </div>
+    </section>
+</div>
+<script>
+    document.getElementById('linkbuttons').addEventListener('click',async function(e){
+        e.preventDefault();
+        // 获取表单数据
+        const attendanceId = null;
+        const employeeId = document.getElementById("employeeId").value;
+        let leaveTime = document.getElementById("leaveTime").value;
+        const attendanceType = document.getElementById("attendanceType").value;
+        const leaveReason = document.getElementById("leaveReason").value;
+
+        // 将时间补全秒
+        if (leaveTime) {
+            leaveTime = leaveTime + ":00";  // 将秒补充为00，变成 '2024-12-27T14:02:00'
+            leaveTime = leaveTime.replace("T", " ");  // 变成 '2024-12-27 14:26:00'
+            // 强制转换为 UTC 时间
+            const date = new Date(leaveTime);  // 创建 Date 对象
+            const utcLeaveTime = date.toISOString();  // 转换为 ISO 格式的 UTC 时间
+
+            // 将 UTC 时间转换为 'yyyy-MM-dd HH:mm:ss' 格式
+            leaveTime = utcLeaveTime.replace('T', ' ').substring(0, 19);  // 去掉 'T' 和毫秒部分
+        }
+        // 定义 records 对象
+        const records = {
+            attendance_id: attendanceId,
+            employee_id: employeeId,
+            attendance_time: leaveTime,
+            attendance_type: attendanceType,
+            leave_reason: leaveReason
+        };
+
+        // 发送请求
+        const response = await fetch('/employee/leaveApply',{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(records)
+            });
+        // 处理响应
+        if(response.ok){
+            alert('请假申请成功');
+            window.location.href = '/employee/leaveApply';
+        }else{
+            alert('请假申请失败');
+        }
+    })
+
+    // 格式化日期为 'yyyy-MM-dd HH:mm:ss' 格式
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册页面</title>
+    <link rel="stylesheet" href="/css/register.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f7fc;
+        }
+
+        .register-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .register-box {
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .register-step {
+            display: none;
+        }
+
+        .register-step.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 20px; /* 增加间距 */
+            text-align: left;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            margin-bottom: 8px; /* 增加标签和输入框之间的间距 */
+            display: block;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;  /* 增大内边距 */
+            font-size: 16px;  /* 增大字体 */
+            margin-top: 5px;
+            border-radius: 6px;  /* 圆角 */
+            border: 1px solid #ccc;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: #4CAF50; /* 聚焦时改变边框颜色 */
+            outline: none;
+        }
+
+        .input-group select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .submit-btn {
+            width: 120px;
+            padding: 12px 10px; /* 增大按钮尺寸 */
+            margin-right: 5px;
+            font-size: 16px;   /* 增大字体 */
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-btn:disabled {
+            background-color: #ccc;
+        }
+
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+
+        #step-number {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="register-container">
+    <div class="register-box">
+        <h2>注册账户 - 步骤 <span id="step-number">1</span></h2>
+
+        <form id="register-form">
+            <!-- 步骤 1 - 基本信息 -->
+            <div id="step-1" class="register-step active">
+                <div class="input-group">
+                    <label for="employee_id">员工编号</label>
+                    <input type="number" id="employee_id" name="employee_id" placeholder="员工编号" required>
+                </div>
+                <div class="input-group">
+                    <label for="employee_name">员工姓名</label>
+                    <input type="text" id="employee_name" name="employee_name" placeholder="员工姓名" required>
+                </div>
+                <div class="input-group">
+                    <label for="employee_username">用户名</label>
+                    <input type="text" id="employee_username" name="employee_username" placeholder="用户名" required>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="submit-btn" onclick="nextStep()">下一步</button>
+                </div>
+            </div>
+
+            <!-- 步骤 2 - 密码设置 -->
+            <div id="step-2" class="register-step">
+                <div class="input-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password" placeholder="密码" required>
+                </div>
+                <div class="input-group">
+                    <label for="confirm-password">确认密码</label>
+                    <input type="password" id="confirm-password" name="confirm-password" placeholder="确认密码" required>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="submit-btn" onclick="prevStep()">上一步</button>
+                    <button type="button" class="submit-btn" onclick="nextStep()">下一步</button>
+                </div>
+            </div>
+
+            <!-- 步骤 3 - 个人信息 -->
+            <div id="step-3" class="register-step">
+                <div class="input-group">
+                    <label for="department">部门</label>
+                    <input type="text" id="department" name="department" placeholder="部门" required>
+                </div>
+                <div class="input-group">
+                    <label for="gender">性别</label>
+                    <select id="gender" name="gender" required>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="phone">电话</label>
+                    <input type="text" id="phone" name="phone" placeholder="电话号码" required>
+                </div>
+                <div class="input-group">
+                    <label for="role">角色</label>
+                    <select id="role" name="role" required>
+                        <option value="员工">员工</option>
+                    </select>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="submit-btn" onclick="prevStep()">上一步</button>
+                    <button type="submit" class="submit-btn">完成注册</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let formData = {};
+
+    function nextStep() {
+        const currentStep = parseInt(document.getElementById("step-number").innerText);
+        const form = document.getElementById("register-form");
+
+        const stepData = new FormData(form);
+        stepData.forEach((value, key) => {
+            formData[key] = value;
+        });
+
+        if (currentStep === 1) {
+            document.getElementById("step-1").classList.remove("active");
+            document.getElementById("step-2").classList.add("active");
+            document.getElementById("step-number").innerText = 2;
+        } else if (currentStep === 2) {
+            document.getElementById("step-2").classList.remove("active");
+            document.getElementById("step-3").classList.add("active");
+            document.getElementById("step-number").innerText = 3;
+        }
+    }
+
+    function prevStep() {
+        const currentStep = parseInt(document.getElementById("step-number").innerText);
+        if (currentStep === 2) {
+            document.getElementById("step-2").classList.remove("active");
+            document.getElementById("step-1").classList.add("active");
+            document.getElementById("step-number").innerText = 1;
+        } else if (currentStep === 3) {
+            document.getElementById("step-3").classList.remove("active");
+            document.getElementById("step-2").classList.add("active");
+            document.getElementById("step-number").innerText = 2;
+        }
+    }
+
+    document.getElementById("register-form").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const finalData = new FormData(event.target);
+        finalData.forEach((value, key) => {
+            formData[key] = value;
+        });
+
+        const formData2 = new URLSearchParams({
+            employee_id: formData.employee_id,
+            employee_name: formData.employee_name,
+            employee_username: formData.employee_username,
+            password: formData.password,
+            confirm_password: formData.confirm_password,
+            department: formData.department,
+            gender: formData.gender,
+            phone: formData.phone,
+            role: formData.role,
+        });
+
+        fetch('/register', {
+            method: 'POST',
+            body: formData2,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }).then(response => {
+            if (response.ok) {
+                return response.text();
+            } else {
+                throw new Error('注册失败');
+            }
+        })
+            .then(data => {
+                alert(data);
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+    });
+</script>
+
+</body>
+</html>

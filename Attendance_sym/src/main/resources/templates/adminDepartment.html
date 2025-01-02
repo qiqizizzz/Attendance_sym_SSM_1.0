@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" href="/css/employeemain.css">
+<head>
+    <meta charset="UTF-8">
+    <title>部门管理</title>
+    <!-- 引入 Google 字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    table th, table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+
+    /* 表单容器 */
+    .modal {
+        display: none; /* 初始隐藏 */
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4); /* 半透明背景 */
+    }
+
+    .modal select{
+        width: 25%;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 10% auto; /* 设置为 5% 距离屏幕顶部 */
+        padding: 20px; /* 更改内边距 */
+        border: 1px solid #888;
+        width: 40%; /* 设置为 40% 屏幕宽度 */
+        max-width: 500px; /* 最大宽度 */
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        font-family: 'Poppins', sans-serif;
+        max-height: 95%; /* 限制高度，避免超出屏幕 */
+    }
+
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    input[type="text"] {
+        width: 95%;
+        padding: 8px;
+        margin-bottom: 12px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    input[type="text"]:focus {
+        outline: none;
+        border-color: #4caf50;
+        box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: center;  /* 让按钮居中显示 */
+        margin-top: 20px;
+    }
+
+    .button-container button {
+        margin-right: 5px;  /* 调整按钮之间的间距 */
+    }
+
+    button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    button[type="submit"] {
+        background-color: #4caf50;
+        width: auto;  /* 设置为自动宽度，保持按钮的原始宽度 */
+        color: white;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #45a049;
+    }
+
+    button[type="button"] {
+        background-color: #f44336;
+        width: auto;  /* 设置为自动宽度，保持按钮的原始宽度 */
+        color: white;
+    }
+
+    button[type="button"]:hover {
+        background-color: #d32f2f;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    /* 编辑按钮样式 */
+    button.editButton {
+        background-color: #2196f3; /* 蓝色背景 */
+        color: white; /* 白色字体 */
+        border: none;
+        border-radius: 5px;
+        padding: 8px 18px; /* 增加内边距 */
+        font-size: 14px; /* 调整字体大小 */
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button.editButton:hover {
+        background-color: #1976d2; /* 深蓝色背景 */
+        transform: scale(1.05); /* 鼠标悬停放大效果 */
+    }
+
+    /* 删除按钮样式 */
+    button.deleteButton {
+        background-color: #f44336; /* 红色背景 */
+        color: white; /* 白色字体 */
+        border: none;
+        border-radius: 5px;
+        padding: 8px 18px; /* 增加内边距 */
+        font-size: 14px; /* 调整字体大小 */
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button.deleteButton:hover {
+        background-color: #d32f2f; /* 深红色背景 */
+        transform: scale(1.05); /* 鼠标悬停放大效果 */
+    }
+
+</style>
+<body>
+<!-- 员工界面 -->
+<!-- 头部 -->
+<header>
+    <div class="logo">
+        <span>企业考勤系统</span>
+    </div>
+    <div class="user">
+        <img src="/img/userimg.jpg" alt="userimg">
+        <span th:text="${username}">[username]</span>
+    </div>
+</header>
+<!-- 主体和侧边栏的容器 -->
+<div class="container">
+    <!-- 侧边栏 -->
+    <aside>
+        <ul>
+            <li><a href="/admin"><span class="icon"></span>首页</a></li>
+            <li><a href="/admin/adminEmployee"><span class="icon"></span>员工管理</a></li>
+            <li><a href="/admin/adminDepartment"><span class="icon"></span>部门管理</a></li>
+            <li><a href="/admin/#"><span class="icon"></span>其他功能</a></li>
+            <li><a href="/admin/#"><span class="icon"></span>其他功能</a></li>
+            <li><a href="/helpAndSupport"><span class="icon"></span>帮助与支持</a></li>
+            <li><a href="/login"><span class="icon"></span>退出登录</a></li>
+        </ul>
+    </aside>
+    <!-- 主体内容 -->
+    <section>
+        <!--增加部门按钮 -->
+        <button type="submit" id="addDepartmentBtn" style="margin-top:5px">增加部门</button>
+        <!-- 增加部门表单 -->
+        <div id="addDepartmentModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeAddDepartmentModal()">&times;</span>
+                <h2>增加部门</h2>
+                <form id="addDepartmentForm" action="/admin/adminDepartment/add" method="post">
+                    <label for="departmentId">部门编号：</label>
+                    <input type="text" id="departmentId" name="department_id" required>
+
+                    <label for="departmentName">部门名称：</label>
+                    <input type="text" id="departmentName" name="department_name" required>
+
+                    <label for="remark">备注：</label>
+                    <input type="text" id="remark" name="remark">
+
+                    <div class="button-container">
+                        <button type="submit">提交</button>
+                        <button type="button" onclick="closeAddDepartmentModal()">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 修改部门表单 -->
+        <div id="editDepartmentModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeEditDepartmentModal()">&times;</span>
+                <h2>修改部门信息</h2>
+                <form id="editDepartmentForm" action="/admin/adminDepartment/edit/${department_id}" method="post">
+                    <label for="editDepartmentId">部门编号：</label>
+                    <input type="text" id="editDepartmentId" name="department_id" required disabled>
+
+                    <label for="editDepartmentName">部门名称：</label>
+                    <input type="text" id="editDepartmentName" name="department_name" required>
+
+                    <label for="editRemark">备注：</label>
+                    <input type="text" id="editRemark" name="remark">
+
+                    <div class="button-container">
+                        <button type="submit">提交修改</button>
+                        <button type="button" onclick="closeEditDepartmentModal()">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 删除部门确认框 -->
+        <div id="deleteDepartmentModal" class="modal">
+            <div class="modal-content" style="width: 400px;text-align: center;">
+                <span class="close" onclick="closeDeleteDepartmentModal()">&times;</span>
+                <h2>确认删除</h2>
+                <p>你确定要删除此部门信息吗？</p>
+                <div class="button-container">
+                    <button type="submit" id="confirmDeleteBtn">确认删除</button>
+                    <button type="button" onclick="closeDeleteDepartmentModal()">取消</button>
+                </div>
+            </div>
+        </div>
+        <!-- 表格展示 -->
+        <table>
+            <thead>
+            <tr>
+                <th>序号</th>
+                <th>部门编号</th>
+                <th>部门名称</th>
+                <th>备注</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="department,iterSat : ${departmentList}">
+                <td th:text="${(currentPage - 1) * size+iterSat.index+1}"></td>
+                <td th:text="${department.department_id}"></td>
+                <td th:text="${department.department_name}"></td>
+                <td th:text="${department.remark}"></td>
+                <td>
+                    <button class="editButton">编辑</button>
+                    <button class="deleteButton">删除</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- 分页控件 -->
+        <div class="pagination">
+            <!-- 上一页按钮 -->
+            <button th:if="${currentPage > 1}"
+                    th:onclick="'window.location.href=\'/admin/adminDepartment?page=' + (${currentPage} - 1) + '&size=' + ${size} + '\''">
+                上一页
+            </button>
+
+            <!-- 当前页码显示 -->
+            <span th:text="'第 ' + ${currentPage} + ' 页 / 共 ' + ${totalPages} + ' 页'"></span>
+
+            <!-- 下一页按钮 -->
+            <button th:if="${currentPage < totalPages}"
+                    th:onclick="'window.location.href=\'/admin/adminDepartment?page=' + (${currentPage} + 1) + '&size=' + ${size} + '\''">
+                下一页
+            </button>
+        </div>
+    </section>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // 监听添加部门按钮
+        document.getElementById('addDepartmentBtn').addEventListener('click', openAddDepartmentModal);
+    });
+
+    // 打开添加部门弹窗
+    function openAddDepartmentModal() {
+        document.getElementById('addDepartmentModal').style.display = 'block';
+    }
+
+    // 关闭添加部门弹窗
+    function closeAddDepartmentModal() {
+        document.getElementById('addDepartmentModal').style.display = 'none';
+    }
+
+    //添加部门表单提交
+    document.getElementById('addDepartmentForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        // 获取表单数据
+        const formData = new FormData(this);
+
+        // 发送添加部门请求
+        fetch('/admin/adminDepartment/add', {
+            method: 'POST',
+            body: formData
+            })
+            .then(response => response.json())  // 假设返回 JSON 格式
+            .then(data => {
+                if (data.success) {
+                    alert('部门增加成功');
+                    closeAddDepartmentModal();  // 关闭模态框
+                    location.reload();  // 刷新页面
+                } else {
+                    alert('增加部门失败');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('请求失败，请稍后再试');
+            });
+    });
+
+    // 控制编辑部门模态框的显示与隐藏
+    function openEditDepartmentModal() {
+        // 显示模态框
+        document.getElementById('editDepartmentModal').style.display = 'block';
+    }
+
+    // 控制删除部门模态框的显示与隐藏
+    function openDeleteDepartmentModal() {
+        // 显示模态框
+        document.getElementById('deleteDepartmentModal').style.display = 'block';
+    }
+
+    // 关闭编辑部门模态框
+    function closeEditDepartmentModal() {
+        document.getElementById('editDepartmentModal').style.display = 'none';
+    }
+
+    // 关闭删除部门模态框
+    function closeDeleteDepartmentModal() {
+        document.getElementById('deleteDepartmentModal').style.display = 'none';
+    }
+
+    //// 为每个“编辑”按钮绑定点击事件
+    document.querySelectorAll('button.editButton').forEach(function (button) {
+        button.addEventListener('click', function (event) {
+            //获取部门信息
+            const row=event.target.closest('tr');
+            document.getElementById('editDepartmentId').value=row.children[1].textContent.trim();
+            document.getElementById('editDepartmentName').value=row.children[2].textContent.trim();
+            document.getElementById('editRemark').value=row.children[3].textContent.trim();
+
+            //显示编辑部门模态框
+            openEditDepartmentModal();
+        });
+    });
+
+    //监听编辑部门表单提交
+    document.getElementById('editDepartmentForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        // 获取表单数据
+        const formData = new FormData(this);
+        const department_id=document.getElementById('editDepartmentId').value;
+        // 发送修改部门请求
+        fetch(`/admin/adminDepartment/edit/${department_id}`, {
+            method: 'Put',
+            body: formData
+            })
+            .then(response => response.json())  // 假设返回 JSON 格式
+            .then(data => {
+                if (data.success) {
+                    alert('部门修改成功');
+                    closeEditDepartmentModal();  // 关闭模态框
+                    location.reload();  // 刷新页面
+                } else {
+                    alert('修改部门失败');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('请求失败，请稍后再试');
+            });
+    });
+
+    // 为每个“删除”按钮绑定点击事件
+    document.querySelectorAll('button.deleteButton').forEach(function (button) {
+        button.addEventListener('click', function (event) {
+            //获取部门信息
+            const row=event.target.closest('tr');
+            const department_id=row.children[1].textContent.trim();
+            const department_name=row.children[2].textContent.trim();
+            //显示删除部门模态框
+            openDeleteDepartmentModal();
+            //绑定确认删除按钮事件
+            document.getElementById('confirmDeleteBtn').addEventListener('click', function (event) {
+                //发送删除部门请求
+                fetch(`/admin/adminDepartment/delete/${department_id}`, {
+                    method: 'DELETE'
+                    })
+                    .then(response => response.json())  // 假设返回 JSON 格式
+                    .then(data => {
+                        if (data.success) {
+                            alert(`部门删除成功`);
+                            closeDeleteDepartmentModal();  // 关闭模态框
+                            location.reload();  // 刷新页面
+                        } else {
+                            alert(`删除部门失败`);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('请求失败，请稍后再试');
+                    });
+            });
+        });
+    });
+
+</script>
+
+</body>
+</html>

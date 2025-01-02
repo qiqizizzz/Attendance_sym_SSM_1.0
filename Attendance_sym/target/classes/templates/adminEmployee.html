@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" href="/css/employeemain.css">
+<head>
+    <meta charset="UTF-8">
+    <title>员工管理</title>
+    <!-- 引入 Google 字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    table th, table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+
+    table th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+    }
+
+    /* 为按钮添加间距 */
+    button {
+        margin-right: 1px; /* 设置按钮之间的间距 */
+    }
+
+    .pagination {
+        margin: 20px 0;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .pagination button {
+        color:black;
+        padding: 5px 10px;
+        border: 1px solid #ddd;
+        background-color: #f4f4f4;
+        cursor: pointer;
+    }
+
+    .pagination button:hover {
+        background-color: #e0e0e0;
+    }
+
+    .pagination span {
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    /* 表单容器 */
+    .modal {
+        display: none; /* 初始隐藏 */
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4); /* 半透明背景 */
+    }
+
+    .modal select{
+        width: 25%;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 1% auto; /* 距离顶部稍微多一点 */
+        padding: 15px; /* 减小内边距 */
+        border: 1px solid #888;
+        width: 40%; /* 设置为屏幕宽度的 40% */
+        max-width: 500px; /* 最大宽度，避免过宽 */
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        font-family: 'Poppins', sans-serif;
+        max-height: 95%; /* 限制高度，避免超出屏幕 */
+
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    select {
+        width: 95%;
+        padding: 8px;
+        margin-bottom: 12px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    select:focus {
+        outline: none;
+        border-color: #4caf50;
+        box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: center;  /* 让按钮居中显示 */
+        margin-top: 20px;
+    }
+
+    .button-container button {
+        margin-right: 5px;  /* 调整按钮之间的间距 */
+    }
+
+    button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    button[type="submit"] {
+        background-color: #4caf50;
+        width: auto;  /* 设置为自动宽度，保持按钮的原始宽度 */
+        color: white;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #45a049;
+    }
+
+    button[type="button"] {
+        background-color: #f44336;
+        width: auto;  /* 设置为自动宽度，保持按钮的原始宽度 */
+        color: white;
+    }
+
+    button[type="button"]:hover {
+        background-color: #d32f2f;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        font-family: 'Poppins', sans-serif;
+        background-color: #fff; /* 白色背景 */
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+    }
+
+    table th {
+        background-color: rgb(33, 33, 33); /* 深绿色背景 */
+        color: white; /* 标题文字为白色 */
+        padding: 8px 8px;
+        text-align: center;
+        font-weight: 600;
+    }
+
+    table td {
+        padding: 10px 8px;
+        text-align: center;
+        border: 1px solid #ddd; /* 柔和的边框颜色 */
+        color: #333; /* 默认字体颜色 */
+    }
+
+    /* 奇数行和偶数行的不同背景 */
+    table tr:nth-child(odd) {
+        background-color: #f9f9f9; /* 偶数行浅灰色 */
+    }
+
+    table tr:nth-child(even) {
+        background-color: #ffffff; /* 奇数行白色 */
+    }
+
+    /* 鼠标悬停高亮 */
+    table tr:hover {
+        background-color: #f1f1f1; /* 淡绿色高亮 */
+    }
+
+    /* 表格外边距 */
+    table th, table td {
+        border-bottom: 1px solid #ddd; /* 表格边框颜色 */
+    }
+
+    /* 分页按钮 */
+    .pagination {
+        margin: 20px 0;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .pagination button {
+        padding: 5px 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: rgb(33, 33, 33);
+        color: white;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .pagination button:hover {
+        background-color: rgb(58, 58, 58);
+    }
+
+    .pagination span {
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    /* 编辑按钮样式 */
+    button.edit-btn {
+        background-color: #2196f3; /* 蓝色背景 */
+        color: white; /* 白色字体 */
+        border: none;
+        border-radius: 5px;
+        padding: 8px 18px; /* 增加内边距 */
+        font-size: 14px; /* 调整字体大小 */
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button.edit-btn:hover {
+        background-color: #1976d2; /* 深蓝色背景 */
+        transform: scale(1.05); /* 放大按钮效果 */
+    }
+
+    /* 删除按钮样式 */
+    button.delete-btn {
+        background-color: #f44336; /* 红色背景 */
+        color: white; /* 白色字体 */
+        border: none;
+        border-radius: 5px;
+        padding: 8px 18px; /* 增加内边距 */
+        font-size: 14px; /* 调整字体大小 */
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button.delete-btn:hover {
+        background-color: #d32f2f; /* 深红色背景 */
+        transform: scale(1.05); /* 放大按钮效果 */
+    }
+
+</style>
+<body>
+<!-- 员工界面 -->
+<!-- 头部 -->
+<header>
+    <div class="logo">
+        <span>企业考勤系统</span>
+    </div>
+    <div class="user">
+        <img src="/img/userimg.jpg" alt="userimg">
+        <span th:text="${username}">[username]</span>
+    </div>
+</header>
+<!-- 主体和侧边栏的容器 -->
+<div class="container">
+    <!-- 侧边栏 -->
+    <aside>
+        <ul>
+            <li><a href="/admin"><span class="icon"></span>首页</a></li>
+            <li><a href="/admin/adminEmployee"><span class="icon"></span>员工管理</a></li>
+            <li><a href="/admin/adminDepartment"><span class="icon"></span>部门管理</a></li>
+            <li><a href="/admin/#"><span class="icon"></span>其他功能</a></li>
+            <li><a href="/admin/#"><span class="icon"></span>其他功能</a></li>
+            <li><a href="/helpAndSupport"><span class="icon"></span>帮助与支持</a></li>
+            <li><a href="/login"><span class="icon"></span>退出登录</a></li>
+        </ul>
+    </aside>
+    <!-- 主体内容 -->
+    <section>
+        <!--增加员工按钮 -->
+        <button type="submit" id="addEmployeeBtn" style="margin-top:5px">增加员工</button>
+        <!-- 增加员工表单 -->
+        <div id="addEmployeeModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeAddEmployeeModal()">&times;</span>
+                <h2>增加员工</h2>
+                <form id="addEmployeeForm" action="/admin/adminEmployee/add" method="post">
+                    <label for="employeeId">员工编号：</label>
+                    <input type="text" id="employeeId" name="employee_id" required>
+
+                    <label for="employeeName">员工姓名：</label>
+                    <input type="text" id="employeeName" name="employee_name" required>
+
+                    <label for="employee_username">用户名：</label>
+                    <input type="text" id="employee_username" name="employee_username" required>
+
+                    <label for="password">密码：</label>
+                    <input type="text" id="password" name="password" required>
+
+                    <label for="department">部门：</label>
+                    <input type="text" id="department" name="department" required>
+
+                    <label for="gender">性别：</label>
+                    <select id="gender" name="gender" required>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+
+                    <label for="phone">联系方式：</label>
+                    <input type="text" id="phone" name="phone" required>
+
+                    <label for="role">角色：</label>
+                    <select id="role" name="role" required>
+                        <option value="员工">员工</option>
+                        <option value="部门管理员">部门管理员</option>
+                        <option value="管理员">管理员</option>
+                    </select>
+
+                    <div class="button-container">
+                        <button type="submit">提交</button>
+                        <button type="button" onclick="closeAddEmployeeModal()">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 修改员工表单 -->
+        <div id="editEmployeeModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeEditEmployeeModal()">&times;</span>
+                <h2>修改员工信息</h2>
+                <form id="editEmployeeForm" action="/admin/adminEmployee/edit/${employee_id}" method="post">
+                    <label for="editEmployeeId">员工编号：</label>
+                    <input type="text" id="editEmployeeId" name="employee_id" required disabled>
+
+                    <label for="editEmployeeName">员工姓名：</label>
+                    <input type="text" id="editEmployeeName" name="employee_name" required>
+
+                    <label for="editUsername">用户名：</label>
+                    <input type="text" id="editUsername" name="employee_username" required>
+
+                    <label for="editPassword">密码：</label>
+                    <input type="text" id="editPassword" name="password">
+
+                    <label for="editDepartment">部门：</label>
+                    <input type="text" id="editDepartment" name="department" required>
+
+                    <label for="editGender">性别：</label>
+                    <select id="editGender" name="gender" required>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+
+                    <label for="editPhone">联系方式：</label>
+                    <input type="text" id="editPhone" name="phone" required>
+
+                    <label for="editRole">角色：</label>
+                    <select id="editRole" name="role" required>
+                        <option value="员工">员工</option>
+                        <option value="部门管理员">部门管理员</option>
+                        <option value="管理员">管理员</option>
+                    </select>
+
+                    <div class="button-container">
+                        <button type="submit">提交修改</button>
+                        <button type="button" onclick="closeEditEmployeeModal()">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 删除员工确认框 -->
+        <div id="deleteEmployeeModal" class="modal">
+            <div class="modal-content" style="width: 400px;text-align: center;">
+                <span class="close" onclick="closeDeleteEmployeeModal()">&times;</span>
+                <h2>确认删除</h2>
+                <p>你确定要删除此员工信息吗？</p>
+                <div class="button-container">
+                    <button type="submit" id="confirmDeleteBtn" >确认删除</button>
+                    <button type="button" onclick="closeDeleteEmployeeModal()">取消</button>
+                </div>
+            </div>
+        </div>
+        <!-- 表格展示 -->
+        <table>
+            <thead>
+            <tr>
+                <th>序号</th>
+                <th>员工编号</th>
+                <th>员工姓名</th>
+                <th>用户名</th>
+                <th>密码</th>
+                <th>部门</th>
+                <th>性别</th>
+                <th>联系方式</th>
+                <th>角色</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="employee,iterSat :${employeeList}">
+                <td th:text="${(currentPage - 1) * size+iterSat.index+1}"></td>
+                <td th:text="${employee.employee_id}"></td>
+                <td th:text="${employee.employee_name}"></td>
+                <td th:text="${employee.employee_username}"></td>
+                <td th:text="${employee.password}"></td>
+                <td th:text="${employee.department}"></td>
+                <td th:text="${employee.gender}"></td>
+                <td th:text="${employee.phone}"></td>
+                <td th:text="${employee.role}"></td>
+                <td>
+                    <button class="edit-btn">编辑</button>
+                    <button class="delete-btn">删除</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- 分页控件 -->
+        <div class="pagination">
+            <!-- 上一页按钮 -->
+            <button th:if="${currentPage > 1}"
+                    th:onclick="'window.location.href=\'/admin/adminEmployee?page=' + (${currentPage} - 1) + '&size=' + ${size} + '\''">
+                上一页
+            </button>
+
+            <!-- 当前页码显示 -->
+            <span th:text="'第 ' + ${currentPage} + ' 页 / 共 ' + ${totalPages} + ' 页'"></span>
+
+            <!-- 下一页按钮 -->
+            <button th:if="${currentPage < totalPages}"
+                    th:onclick="'window.location.href=\'/admin/adminEmployee?page=' + (${currentPage} + 1) + '&size=' + ${size} + '\''">
+                下一页
+            </button>
+        </div>
+    </section>
+</div>
+</body>
+<script>
+    // 控制模态框显示与隐藏的函数
+    function closeAddEmployeeModal() {
+        document.getElementById('addEmployeeModal').style.display = 'none';
+    }
+
+    // 控制编辑员工模态框的显示与隐藏
+    function closeEditEmployeeModal() {
+        document.getElementById('editEmployeeModal').style.display = 'none';
+    }
+
+    // 控制删除员工模态框的显示与隐藏
+    function closeDeleteEmployeeModal() {
+        document.getElementById('deleteEmployeeModal').style.display = 'none';
+    }
+
+        // 打开添加员工模态框
+        document.getElementById('addEmployeeBtn').addEventListener('click', function () {
+        document.getElementById('addEmployeeModal').style.display = 'block';
+    });
+
+    // 监听表单提交事件，提交数据到后端
+    document.getElementById('addEmployeeForm').addEventListener('submit', function (event) {
+        event.preventDefault(); // 防止默认的表单提交
+
+        // 获取表单数据
+        const formData = new FormData(this);
+
+        // 使用 Fetch API 发送 POST 请求
+        fetch('/admin/adminEmployee/add', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())  // 假设返回 JSON 格式
+            .then(data => {
+                if (data.success) {
+                    alert('员工增加成功');
+                    closeAddEmployeeModal();  // 关闭模态框
+                    location.reload();  // 刷新页面
+                } else {
+                    alert('增加员工失败');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('请求失败，请稍后再试');
+            });
+    });
+
+        // 为每个“编辑”按钮绑定点击事件
+        document.querySelectorAll('button.edit-btn').forEach(function (button) {
+        button.addEventListener('click', function (event) {
+        // 获取员工信息，模拟填充修改表单
+        const row = event.target.closest('tr');
+        document.getElementById('editEmployeeId').value = row.children[1].textContent.trim();
+        document.getElementById('editEmployeeName').value = row.children[2].textContent.trim();
+        document.getElementById('editUsername').value = row.children[3].textContent.trim();
+        document.getElementById('editPassword').value = row.children[4].textContent.trim();
+        document.getElementById('editDepartment').value = row.children[5].textContent.trim();
+        document.getElementById('editGender').value = row.children[6].textContent.trim();
+        document.getElementById('editPhone').value = row.children[7].textContent.trim();
+        document.getElementById('editRole').value = row.children[8].textContent.trim();
+
+        // 显示编辑模态框
+        document.getElementById('editEmployeeModal').style.display = 'block';
+    });
+    });
+
+
+    // 监听表单提交事件，提交更新的员工数据
+    document.getElementById('editEmployeeForm').addEventListener('submit', function (event) {
+        event.preventDefault(); // 防止默认的表单提交
+
+        const formData = new FormData(this);
+        const employee_id = document.getElementById('editEmployeeId').value;
+
+
+        fetch(`/admin/adminEmployee/edit/${employee_id}`, {
+            method: 'Put',
+            body: formData
+        })
+            .then(response => response.json())  // 假设返回 JSON 格式
+            .then(data => {
+                if (data.success) {
+                    alert('员工信息更新成功');
+                    closeEditEmployeeModal();  // 关闭模态框
+                    location.reload();  // 刷新页面
+                } else {
+                    alert('更新员工信息失败');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('请求失败，请稍后再试');
+            });
+    });
+
+    // 为每个“删除”按钮绑定点击事件
+    document.querySelectorAll('button').forEach(function (button) {
+        if (button.textContent.trim() === '删除') {
+            button.addEventListener('click', function (event) {
+                // 获取员工信息，模拟填充删除模态框
+                const row = event.target.closest('tr');
+                const employee_id = row.children[1].textContent.trim();
+                const employeeName = row.children[2].textContent.trim();
+
+                // 更新删除确认模态框
+                const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+                confirmDeleteBtn.onclick = function () {
+                    // 发送删除请求
+                    fetch(`/admin/adminEmployee/delete/${employee_id}`, {
+                        method: 'Delete'
+                    })
+                        .then(response => response.json())  // 假设返回 JSON 格式
+                        .then(data => {
+                            if (data.success) {
+                                alert('员工删除成功');
+                                closeDeleteEmployeeModal();  // 关闭模态框
+                                location.reload();  // 刷新页面
+                            } else {
+                                alert('删除员工失败');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('请求失败，请稍后再试');
+                        });
+                };
+
+                // 显示删除模态框
+                document.getElementById('deleteEmployeeModal').style.display = 'block';
+            });
+        }
+    });
+
+</script>
+</html>

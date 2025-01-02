@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" href="/css/employeemain.css">
+<link rel="stylesheet" href="/css/employeeBorderStyle.css">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee Dashboard</title>
+    <!-- 引入 Google 字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body th:data-employee-id="${id}">
+<!-- 员工界面 -->
+<!-- 头部 -->
+<header>
+    <div class="logo">
+        <span>企业考勤系统</span>
+    </div>
+    <div class="user">
+        <img src="/img/userimg.jpg" alt="userimg">
+        <span th:text="${username}">[username]</span>
+    </div>
+</header>
+<!-- 主体和侧边栏的容器 -->
+<div class="container">
+    <!-- 侧边栏 -->
+    <aside>
+        <ul>
+            <li><a href="/employee"><span class="icon"></span>首页</a></li>
+            <li><a href="/employee/employeeRecords"><span class="icon"></span>考勤记录</a></li>
+            <li><a href="/employee/leaveApply"><span class="icon"></span>请假申请</a></li>
+            <li><a href="/employee/overtime"><span class="icon"></span>加班记录</a></li>
+            <li><a href="/employee/attendanceStatistics"><span class="icon"></span>考勤统计</a></li>
+            <li><a href="/employee/helpAndSupport"><span class="icon"></span>帮助与支持</a></li>
+            <li><a href="/login"><span class="icon"></span>退出登录</a></li>
+            <hr>
+        </ul>
+    </aside>
+    <!-- 主体内容 -->
+    <section>
+        <div class="attendance-container">
+            <h1>你好,员工<span th:text="${username}">[username]</span>!</h1>
+            <br>
+            <h2>考勤登记</h2>
+
+            <form id="attendanceForm">
+                <label for="attendanceType">考勤类别:</label>
+                <select id="attendanceType" name="attendanceType">
+                    <option value="上班">上班</option>
+                    <option value="下班">下班</option>
+                </select>
+                <br>
+                <label for="attendanceTimeDisplay">考勤时间:</label>
+                <span id="attendanceTimeDisplay"></span>
+                <br>
+                <button type="submit" id="submitBtn">打卡</button>
+            </form>
+        </div>
+
+    </section>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const displayTime = document.getElementById("attendanceTimeDisplay");
+
+        function getFormattedTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0'); // 月份从0开始，需要+1
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+
+        // 初次加载显示时间
+        displayTime.textContent = getFormattedTime();
+
+        // 每秒更新一次时间显示
+        setInterval(() => {
+            displayTime.textContent = getFormattedTime();
+        }, 1000);
+    });
+
+
+    // 点击提交按钮触发的事件
+    document.getElementById("attendanceForm").addEventListener('submit',async function (e) {
+        e.preventDefault();
+        // 获取表单数据
+        const attendanceId=null;
+        const employeeId = document.body.getAttribute("data-employee-id");
+        console.log("Employee ID:", employeeId);  // 打印出实际的 employee ID
+        const attendanceType = document.getElementById("attendanceType").value;
+        const attendanceTime = document.getElementById("attendanceTimeDisplay").textContent;
+        const leaveReason = null;
+
+        const records = {
+            attendance_id: attendanceId,
+            employee_id: employeeId,
+            attendance_time: attendanceTime,
+            attendance_type: attendanceType,
+            leave_reason: leaveReason
+        };
+
+        try {
+            const response = await fetch("/employee", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(records)
+            });
+
+            if (response.ok) {
+                alert("考勤记录已成功提交！");
+            } else {
+                alert("提交失败，请稍后重试。");
+            }
+        } catch (error) {
+            console.error('请求失败:', error);
+            alert("提交失败，请稍后重试。");
+        }
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>登录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            border-style: none;
+        }
+        body {
+            background-image: url('/img/bcg.jpg');
+            background-size: cover; /* 确保背景图片覆盖整个屏幕 */
+            background-position: center; /* 背景图片居中显示 */
+            background-repeat: no-repeat; /* 防止背景图片重复 */
+        }
+        p {
+            background-color: rgb(255, 255, 255);
+        }
+        p.style1 {
+            height: 150px;
+            line-height: 150px;
+            font-size: 20px;
+            font-weight: 900;
+            color: rgb(123, 174, 187);
+            text-align: center;
+        }
+        label.style2 {
+            font-size: 18px;
+            font-weight: 900;
+            color: rgb(151, 195, 204);
+        }
+        p.style3 {
+            font-size: 16px;
+            font-weight: 900;
+            height: 60px;
+            line-height: 60px;
+            color: rgb(161, 207, 217);
+            text-align: center;
+        }
+        p.style3 a {
+            color: rgb(68, 160, 179);
+            text-decoration: none;
+        }
+        p.style3 a:hover {
+            text-decoration: underline;
+        }
+        .bcg {
+            background-color: rgb(255, 255, 255);
+            width: 420px;
+            height: 520px;
+            margin: 100px auto;
+            box-shadow: 1px 2px 5px #b5b3b3;
+        }
+        .login {
+            background-color: rgb(255, 255, 255);
+            width: 420px;
+            height: 520px;
+            margin: 100px auto;
+            box-shadow: 6px 10px 15px 5px #b5b3b3;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .login .div1 {
+            background-color: rgb(255, 255, 255);
+            height: 120px;
+            margin-left: 30px;
+        }
+        .login-input {
+            background-color: rgb(244, 249, 251);
+            width: 350px;
+            height: 50px;
+            margin-top: 10px;
+            box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            text-indent: 15px;
+            border: 1px solid #ddd;
+        }
+        .login-input:focus {
+            outline: none;
+            border: 1px solid rgb(68, 160, 179);
+            box-shadow: 0 0 5px rgb(68, 160, 179);
+        }
+        button {
+            width: 350px;
+            height: 50px;
+            color: white;
+            margin-left: 35px;
+            margin-top: 20px;
+            background-color: rgb(68, 160, 179);
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            font-weight: 600;
+            font-size: 17px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: rgb(53, 124, 138);
+            transition: background-color 0.3s;
+        }
+        button:active {
+            border-style: none;
+        }
+        label {
+            background-color: rgb(255, 255, 255);
+        }
+    </style>
+</head>
+<body>
+<form id="login-form">
+    <div class="login">
+        <p class="style1">登陆您的账户</p>
+        <div class="div1">
+            <label for="username" class="style2">UserName</label>
+            <input type="text" name="username" id="username" autocomplete="text" class="login-input" required>
+        </div>
+        <div class="div1">
+            <label for="password" class="style2">PassWord</label>
+            <input type="password" name="password" id="password" autocomplete="current-password" class="login-input" required><br>
+        </div>
+        <button id="login-btn">Sign In</button>
+        <p class="style3">还没有帐户? <a href="/register" class="register">注册</a></p>
+    </div>
+</form>
+<script>
+    document.getElementById('login-btn').addEventListener('click', async function (e) {
+        e.preventDefault(); // 阻止默认表单提交行为
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        // 向后端发送 POST 请求
+        const response = await fetch('http://localhost:8080/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+        });
+
+        if (response.ok) {
+            // 登录成功，获取角色信息
+            const role = await response.text();  // 角色信息（如 'employee', 'admin', 'deptAdmin'）
+
+            // 根据角色跳转到不同的界面
+            if (role === '员工') {
+                window.location.href = 'employee';  // 员工界面
+            } else if (role === '管理员') {
+                window.location.href = 'admin';  // 管理员界面
+            } else if (role === '部门管理员') {
+                window.location.href = 'deptAdmin';  // 部门管理员界面
+            } else {
+                alert("Unknown role");
+            }
+        } else {
+            // 登录失败，显示错误信息
+            const errorMessage = await response.text();
+            alert(errorMessage);  // 弹窗显示登录失败的原因
+        }
+    });
+</script>
+</body>
+</html>
